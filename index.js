@@ -4,128 +4,153 @@ const app = express();
 
 app.use(express.json());
 
-const tasks = [
-    {
-        id: 1,
-        name: "Task 1",
-        completed: false
-    },
-    {
-        id: 2,
-        name: "Task 2",
-        completed: false
-    },
-    {
-        id: 3,
-        name: "Task 3",
-        completed: false
-    }
-]
+// const tasks = [
+//     {
+//         id: 1,
+//         name: "Task 1",
+//         completed: false
+//     },
+//     {
+//         id: 2,
+//         name: "Task 2",
+//         completed: false
+//     },
+//     {
+//         id: 3,
+//         name: "Task 3",
+//         completed: false
+//     }
+// ]
 
-// GET
-app.get("/api/tasks", (request, response) => {
-    response.send(tasks);
-})
+app.post("/calc", (request, response) => {
 
-//GET by id
-app.get("/api/tasks/:id", (request, response) => {
-    const taskId = request.params.id;
-    const task = tasks.find(task => task.id === parseInt(taskId));
-    if (!task) {
-        return response.status(404).send("The task with the provided ID does not exist.")
-    }
-    response.send(task);
-});
+    // width, unit_of_width
+    // length, unit_of_length
+    // weight, unit_of_weight
+    // whether_standard
 
-const {taskSchema} = require('./utils/task-schema.js')
-
-// POST
-
-app.post("/api/tasks", (request, response) => {
-
-    const {error, value} = taskSchema.validate(request.body);
-
-    if (error) return response.status(400).send('The name should be at least 3 chars long!');
-
-    //lets create the new object we will pass to the tasks array
-
-    const task = {
-       id: tasks.length + 1,
-       name: request.body.name,
-       completed: request.body.completed
+    if (!(request.body.length_unit == "mm" || request.body.length_unit == "inch")){
+        response.status(400).send("Envelope unit for length is neither the accepted mm or inch.");
+        return;
     }
 
-    //lets push in to the tasks array
+    if (request.body.length < 0) {
+        response.status(400).send("Envelope length received is not positive.");
+        return;
+    }
+    if (request.body.length > 380) {
+        response.status(400).send("Envelope length received exceeds maximal 380 mm.");
+        return;
+    }
 
-    tasks.push(task);
-
-    response.send(task);
 
 });
 
 
-// PUT
-app.put("/api/tasks/:id", (request, response) => {
-    const taskId = request.params.id;
-    const task = tasks.find(task => task.id === parseInt(taskId));
-    if (!task) {
-        return response.status(404).send("The task with the provided ID does not exist.")
-    }
+// // GET
+// app.get("/api/tasks", (request, response) => {
+//     response.send(tasks);
+// })
 
-    const {error, value} = taskSchema.validate(request.body);
+// //GET by id
+// app.get("/api/tasks/:id", (request, response) => {
+//     const taskId = request.params.id;
+//     const task = tasks.find(task => task.id === parseInt(taskId));
+//     if (!task) {
+//         return response.status(404).send("The task with the provided ID does not exist.")
+//     }
+//     response.send(task);
+// });
 
-    if (error) return response.status(400).send('The name should be at least 3 chars long!');
+// const {taskSchema} = require('./utils/task-schema.js')
 
-    //lets create the new object we will pass to the tasks array
+// // POST
 
+// app.post("/api/tasks", (request, response) => {
 
-    task.name = request.body.name,
-    task.completed = request.body.completed
+//     const {error, value} = taskSchema.validate(request.body);
 
+//     if (error) return response.status(400).send('The name should be at least 3 chars long!');
 
-    response.send(task);
+//     //lets create the new object we will pass to the tasks array
 
-});
+//     const task = {
+//        id: tasks.length + 1,
+//        name: request.body.name,
+//        completed: request.body.completed
+//     }
 
+//     //lets push in to the tasks array
 
-// PATCH
-app.patch("/api/tasks/:id", (request, response) => {
-    const taskId = request.params.id;
-    const task = tasks.find(task => task.id === parseInt(taskId));
-    if (!task) {
-        return response.status(404).send("The task with the provided ID does not exist.")
-    }
+//     tasks.push(task);
 
-    const {error, value} = taskSchema.validate(request.body);
+//     response.send(task);
 
-    if (error) return response.status(400).send('The name should be at least 3 chars long!');
-
-    //lets create the new object we will pass to the tasks array
-
-
-    task.name = request.body.name;
-
-    if (request.body.completed) {
-        task.completed = request.body.completed
-    }
-
-    response.send(task);
-
-});
+// });
 
 
-// DELETE
-app.delete("/api/tasks/:id", (request, response) => {
-    const taskId = request.params.id;
-    const task = tasks.find(task => task.id === parseInt(taskId));
-    if (!task) {
-        return response.status(404).send("The task with the provided ID does not exist.")
-    }
+// // PUT
+// app.put("/api/tasks/:id", (request, response) => {
+//     const taskId = request.params.id;
+//     const task = tasks.find(task => task.id === parseInt(taskId));
+//     if (!task) {
+//         return response.status(404).send("The task with the provided ID does not exist.")
+//     }
 
-    const index = tasks.indexOf(task);
-    tasks.splice(index, 1);
-    response.send(task);
-});
+//     const {error, value} = taskSchema.validate(request.body);
+
+//     if (error) return response.status(400).send('The name should be at least 3 chars long!');
+
+//     //lets create the new object we will pass to the tasks array
+
+
+//     task.name = request.body.name,
+//     task.completed = request.body.completed
+
+
+//     response.send(task);
+
+// });
+
+
+// // PATCH
+// app.patch("/api/tasks/:id", (request, response) => {
+//     const taskId = request.params.id;
+//     const task = tasks.find(task => task.id === parseInt(taskId));
+//     if (!task) {
+//         return response.status(404).send("The task with the provided ID does not exist.")
+//     }
+
+//     const {error, value} = taskSchema.validate(request.body);
+
+//     if (error) return response.status(400).send('The name should be at least 3 chars long!');
+
+//     //lets create the new object we will pass to the tasks array
+
+
+//     task.name = request.body.name;
+
+//     if (request.body.completed) {
+//         task.completed = request.body.completed
+//     }
+
+//     response.send(task);
+
+// });
+
+
+// // DELETE
+// app.delete("/api/tasks/:id", (request, response) => {
+//     const taskId = request.params.id;
+//     const task = tasks.find(task => task.id === parseInt(taskId));
+//     if (!task) {
+//         return response.status(404).send("The task with the provided ID does not exist.")
+//     }
+
+//     const index = tasks.indexOf(task);
+//     tasks.splice(index, 1);
+//     response.send(task);
+// });
 
 
 const port = process.env.PORT || 3000;
