@@ -7,10 +7,11 @@ app.use(express.json());
 
 app.post("/calc", (request, response) => {
 
+    let rate = 0;
+
     // width, unit_of_width
     // length, unit_of_length
     // weight, unit_of_weight
-    // whether_standard
 
     // 0. test if all params exist
 
@@ -45,13 +46,6 @@ app.post("/calc", (request, response) => {
 
     if (!(request.body.hasOwnProperty('unit_of_weight'))) {
         response.status(400).send("the input UNIT_OF_WEIGHT is missing. ");
-        return;
-    }
-
-    // 0.3 whether_standard
-
-    if (!(request.body.hasOwnProperty('whether_standard'))) {
-        response.status(400).send("the input WHETHER_STANDARD is missing. ");
         return;
     }
 
@@ -94,35 +88,10 @@ app.post("/calc", (request, response) => {
         response.status(400).send("the input UNIT_OF_WEIGHT is not a string. ");
         return;
     }
-    
-    // 1.3 whether_standard should be boolean
-
-    if (!(request.body.whether_standard.toLowerCase() == "true" || request.body.whether_standard.toLowerCase() == "false" )) {
-        response.status(400).send("the input WHETHER_STANDARD is not a boolean. ");
-        return;
-    }
 
     // 2 test if values of params are correct
 
-    // 2.1 width/length/weight should be positive
-
-    if (width <= 0) {
-        response.status(400).send("the input WIDTH should be a positive value. ");
-        return;
-    }
-
-    if (length <= 0) {
-        response.status(400).send("the input LENGTH should be a positive value. ");
-        return;
-    }
-
-    if (weight <= 0) {
-        response.status(400).send("the input WEIGHT should be a positive value. ");
-        return;
-    }
-
-
-    // 2.2 unit_of_width/unit_of_length should be "mm"/"inch",
+    // 2.1 unit_of_width/unit_of_length should be "mm"/"inch",
     //     unit_of_weight should be "gram"/"ounce"
 
     if (!(request.body.unit_of_width == "mm" || request.body.unit_of_width == "inch")) {
@@ -140,6 +109,84 @@ app.post("/calc", (request, response) => {
         return;
     }
 
+    if (request.body.unit_of_width == "inch") {
+        width = width * 25.4;
+    }
+
+    if (request.body.unit_of_length == "inch") {
+        length = length * 25.4;
+    }
+
+    if (request.body.unit_of_weight == "ounce") {
+        weight = weight * 28.35;
+    }
+
+    // 2.2 width/length/weight should be positive
+    //     width < 270 mm
+    //     length < 380 mm
+    //     weight < 500 g
+
+    if (width <= 0) {
+        response.status(400).send("the input WIDTH should be a positive value. ");
+        return;
+    }
+
+    if (width > 270) {
+        response.status(400).send("the input WIDTH exceeds the max value. ");
+        return;
+    }
+
+    if (length <= 0) {
+        response.status(400).send("the input LENGTH should be a positive value. ");
+        return;
+    }
+
+    if (length > 380) {
+        response.status(400).send("the input LENGTH exceeds the max value. ");
+        return;
+    }
+
+    if (weight <= 0) {
+        response.status(400).send("the input WEIGHT should be a positive value. ");
+        return;
+    }
+
+    if (length > 500) {
+        response.status(400).send("the input WEIGHT exceeds the max value. ");
+        return;
+    }
+
+    // 3 determine whether standard or not
+
+    let standard = false;
+
+    if (width >= 90.0 && width <= 156.0 && length >= 140.0 && length <= 245.0 && weight >= 3.0 && weight <= 50.0) {
+        standard = true;
+    }
+
+    if (standard == true && weight <= 30) {
+        rate = 0.49;
+        response.status(200).json({rate});
+        return;
+    }
+
+    if (standard == true && weight > 30) {
+        rate = 0.80;
+        response.status(200).json({rate});
+        return;
+    }
+
+    if (standard == false && weight <= 100) {
+        rate = 0.98;
+        response.status(200).json({rate});
+        return;
+    }
+
+    if (standard == false && weight > 100) {
+        rate = 2.40;
+        response.status(200).json({rate});
+        return;
+    }
 
 });
 
