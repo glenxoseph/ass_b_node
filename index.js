@@ -156,7 +156,7 @@ app.post("/calc", (request, response) => {
         return;
     }
 
-    // 3 determine whether standard or not
+    // 3 determine whether standard or not, and determine the rate
 
     let standard = false;
 
