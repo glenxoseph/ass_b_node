@@ -1,7 +1,7 @@
 # ass_b_node
 
 ## Team Member
-Riad El Mahmoudy - 260853502
+Riad El Mahmoudy - 260853502,
 Glen Xu - 260767363
 
 ## Running the Application
